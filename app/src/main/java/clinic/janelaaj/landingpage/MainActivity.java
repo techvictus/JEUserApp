@@ -1,7 +1,20 @@
 package clinic.janelaaj.landingpage;
 
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
+import android.location.Address;
+import android.location.Geocoder;
+import android.location.Location;
+import android.location.LocationManager;
+
+import com.google.android.gms.location.LocationServices;
+
+import android.provider.Settings;
+
+import com.google.android.gms.location.LocationResult;
+import com.google.android.gms.maps.model.LatLng;
+
 import android.support.design.widget.NavigationView;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -19,9 +32,9 @@ import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.CompoundButton;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.support.v7.app.ActionBarDrawerToggle;
-
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.RadioButton;
@@ -30,6 +43,7 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -52,6 +66,11 @@ public class MainActivity extends AppCompatActivity {
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+
+        /**
+         *  Navigation Drawer
+         */
 
         mDrawerLayout = findViewById(R.id.drawer_layout);
 
@@ -95,13 +114,18 @@ public class MainActivity extends AppCompatActivity {
                 }
         );
         mDrawerLayout = findViewById(R.id.drawer_layout);
-        ImageView menu =(ImageView) findViewById(R.id.ham_menu);
+        ImageView menu = (ImageView) findViewById(R.id.ham_menu);
         menu.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 mDrawerLayout.openDrawer(Gravity.LEFT);
             }
         });
+
+
+        /**
+         *  Ad-View Implementation
+         */
 
         RecyclerView mHorizontalRecyclerView = (RecyclerView) findViewById(R.id.horizontalRecyclerView);
         mHorizontalRecyclerView.addItemDecoration(new DividerItemDecoration(getApplicationContext(),
@@ -118,13 +142,13 @@ public class MainActivity extends AppCompatActivity {
         inbox.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent profileListIntent=new Intent(MainActivity.this,ListActivity.class);
+                Intent profileListIntent = new Intent(MainActivity.this, ListActivity.class);
                 startActivity(profileListIntent);
             }
         });
 
 
-        /*
+        /**
          *  Check functions for buttons with 2*2 layout
          */
 
@@ -197,7 +221,9 @@ public class MainActivity extends AppCompatActivity {
         });
 
 
-
+        /**
+         *  Drop Down implementation including Spinner and Search
+         */
         collapseDropDown.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -217,30 +243,27 @@ public class MainActivity extends AppCompatActivity {
 
         // Initializing an ArrayAdapter
         final ArrayAdapter<String> spinnerArrayAdapter = new ArrayAdapter<String>(
-                this,R.layout.spinner_item,spinnerList){
+                this, R.layout.spinner_item, spinnerList) {
             @Override
-            public boolean isEnabled(int position){
-                if(position == 0)
-                {
+            public boolean isEnabled(int position) {
+                if (position == 0) {
                     // Disable the first item from Spinner
                     // First item will be use for hint
                     return false;
-                }
-                else
-                {
+                } else {
                     return true;
                 }
             }
+
             @Override
             public View getDropDownView(int position, View convertView,
                                         ViewGroup parent) {
                 View view = super.getDropDownView(position, convertView, parent);
                 TextView tv = (TextView) view;
-                if(position == 0){
+                if (position == 0) {
                     // Set the hint text color gray
                     tv.setTextColor(Color.GRAY);
-                }
-                else {
+                } else {
                     tv.setTextColor(Color.BLACK);
                 }
                 return view;
@@ -255,18 +278,42 @@ public class MainActivity extends AppCompatActivity {
                 String selectedItemText = (String) parent.getItemAtPosition(position);
                 // If user change the default selection
                 // First item is disable and it is used for hint
-                if(position > 0){
+                if (position > 0) {
                     // Notify the selected item text
                     Toast.makeText
                             (getApplicationContext(), "Selected : " + selectedItemText, Toast.LENGTH_SHORT)
                             .show();
-
                 }
             }
 
             @Override
             public void onNothingSelected(AdapterView<?> parent) {
 
+            }
+        });
+
+
+        /**
+         *      Getting longitude and latitude according to user's Address entry input
+         */
+        ImageView testing = (ImageView) findViewById(R.id.emergency); //Temp button to get Lat and Lng
+        testing.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                LatLng locationPoint;
+                EditText getAddress = (EditText) findViewById(R.id.edit);
+                String address = getAddress.getText().toString();
+                locationPoint = getLocationFromAddress(MainActivity.this, address);
+                String text = "";
+                double longitude = locationPoint.longitude;
+                double latitude = locationPoint.latitude;
+                if (locationPoint == null) {
+                    Toast.makeText(getApplicationContext(), "Enter Correct Location", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+                text += locationPoint.toString();//longitude + "and" + latitude;
+                TextView showAddress = (TextView) findViewById(R.id.address);
+                showAddress.setText(text);
             }
         });
     }
@@ -309,5 +356,30 @@ public class MainActivity extends AppCompatActivity {
         imageModel5.setImagePath(R.drawable.testimg);
         imageModelArrayList.add(imageModel5);
         return imageModelArrayList;
+    }
+
+    public LatLng getLocationFromAddress(Context context, String strAddress) {
+
+        Geocoder coder = new Geocoder(context);
+        List<Address> address;
+        LatLng p1 = null;
+
+        try {
+            // May throw an IOException
+            address = coder.getFromLocationName(strAddress, 5);
+            if (address == null) {
+                return null;
+            }
+            if (address.size() > 0) {
+
+                Address location = address.get(0);
+                p1 = new LatLng(location.getLatitude(), location.getLongitude());
+            }
+
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        }
+
+        return p1;
     }
 }

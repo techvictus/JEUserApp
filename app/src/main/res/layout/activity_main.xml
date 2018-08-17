@@ -148,8 +148,24 @@
                             android:layout_height="45dp"
                             android:layout_gravity="center"
                             android:layout_marginTop="6dp"
-                            android:background="@drawable/search_border"
-                            android:visibility="visible"></SearchView>
+                            android:visibility="visible"/>
+
+                        <EditText
+                            android:id="@+id/edit"
+                            android:layout_width="300dp"
+                            android:layout_height="45dp"
+                            android:layout_gravity="center"
+                            android:layout_marginTop="6dp"
+                            android:visibility="visible"/>
+
+                        <TextView
+                            android:id="@+id/address"
+                            android:layout_width="300dp"
+                            android:layout_height="45dp"
+                            android:layout_gravity="center"
+                            android:layout_marginTop="6dp"
+                            android:visibility="visible"/>
+
                     </LinearLayout>
 
                     <View
