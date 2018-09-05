@@ -127,6 +127,8 @@ public class ListActivity extends AppCompatActivity {
                 selectedParam = selectedItemText;
                 if (position > 0) {
                     selectedLocationSpinner = true;
+                    if(position == 1)
+                        return;
                     point = pointHash.get(selectedParam);
                     longitude = point.longitude;
                     latitude = point.latitude;

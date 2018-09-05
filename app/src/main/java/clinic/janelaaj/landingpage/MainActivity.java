@@ -366,9 +366,9 @@ public class MainActivity extends AppCompatActivity {
                 Toast.makeText
                         (getApplicationContext(), "Selected : " + selectedItemText, Toast.LENGTH_SHORT)
                         .show();
-                if (position == 0)
-                    return;
                 paramSelectedLocality = selectedItemText;
+                if (position == 0 || position==1)
+                    return;
 //                pointHash = new HashMap<>();
 //                Log.d("abcde", String.valueOf(lists));
 //                for (int i = 0; i < lists.length(); i++) {
