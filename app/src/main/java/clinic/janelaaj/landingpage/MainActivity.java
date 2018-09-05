@@ -366,35 +366,39 @@ public class MainActivity extends AppCompatActivity {
                 Toast.makeText
                         (getApplicationContext(), "Selected : " + selectedItemText, Toast.LENGTH_SHORT)
                         .show();
-                if(position==0)
+                if (position == 0)
                     return;
                 paramSelectedLocality = selectedItemText;
-                pointHash = new HashMap<>();
-                for (int i = 0; i < lists.length(); i++) {
-                    JSONObject localityList = null;
-                    try {
-                        localityList = lists.getJSONObject(i);
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    }
-                    String localityName = null;
-                    try {
-                        assert localityList != null;
-                        localityName = localityList.getString("llocalityname");
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    }
-                    if (paramSelectedLocality.equals(localityName)) {
-                        latitude = Double.parseDouble(localityList.optString("llocality_lat"));
-                        longitude = Double.parseDouble(localityList.optString("llocality_long"));
-                    }
+//                pointHash = new HashMap<>();
+//                Log.d("abcde", String.valueOf(lists));
+//                for (int i = 0; i < lists.length(); i++) {
+//                    JSONObject localityList = null;
+//                    try {
+//                        localityList = lists.getJSONObject(i);
+//                    } catch (JSONException e) {
+//                        e.printStackTrace();
+//                    }
+//                    String localityName = null;
+//                    try {
+//                        assert localityList != null;
+//                        localityName = localityList.getString("llocalityname");
+//                    } catch (JSONException e) {
+//                        e.printStackTrace();
+//                    }
+//                    if (paramSelectedLocality.equals(localityName)) {
+//                        latitude = Double.parseDouble(localityList.optString("llocality_lat"));
+//                        longitude = Double.parseDouble(localityList.optString("llocality_long"));
+//                    }
+//                    Log.d("abcdehash", "???"+ localityList.optString("llocality_lat"));
+//                    point = new LatLng(Double.parseDouble(localityList.optString("llocality_lat")), Double.parseDouble(localityList.optString("llocality_long")));
+//                    Log.d("abcdehash", "abcd"+localityName+ String.valueOf(point.latitude)+ String.valueOf(point.longitude));
+//                    pointHash.put(localityName,point);
+//                }
+                latitude = pointHash.get(selectedItemText).latitude;
+                longitude = pointHash.get(selectedItemText).longitude;
 
-                    point = new LatLng(Double.parseDouble(localityList.optString("llocality_lat")), Double.parseDouble(localityList.optString("llocality_long")));
-                    Log.d("abcdehash", localityName+ String.valueOf(point.latitude)+ String.valueOf(point.longitude));
-                    pointHash.put(localityName,point);
-                }
-                Log.d("abcdehash", "???"+ String.valueOf(pointHash.keySet()));
             }
+
 
             @Override
             public void onNothingSelected(AdapterView<?> parent) {
@@ -696,7 +700,7 @@ public class MainActivity extends AppCompatActivity {
         });
 
         // Passing values to the {@link ListActivity}
-        ImageButton searchButton = (ImageButton) findViewById(R.id.search_button);
+        final ImageButton searchButton = (ImageButton) findViewById(R.id.search_button);
         searchButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -704,9 +708,12 @@ public class MainActivity extends AppCompatActivity {
                     Toast.makeText(getApplicationContext(), "Please select your city!", Toast.LENGTH_SHORT).show();
                     return;
                 }
+                //      searchButton.setImageResource(R.id.search_button);
                 Intent profileListIntent = new Intent(MainActivity.this, ListActivity.class);
                 profileListIntent.putExtra("CityName", cityName);
                 profileListIntent.putExtra("SpecialitySelectedId", specialitySelectedId);
+                if (specialitySelectedId!=null)
+                    Log.d("res234","spcA "+specialitySelectedId);
                 profileListIntent.putExtra("paramSelectedLocality", paramSelectedLocality);
                 profileListIntent.putExtra("paramLatitude", latitude);
                 profileListIntent.putExtra("paramLongitude", longitude);
@@ -715,11 +722,12 @@ public class MainActivity extends AppCompatActivity {
                 profileListIntent.putExtra("specialities",specialities);
                 profileListIntent.putExtra("specialityHash",specialityHash);
                 profileListIntent.putExtra("pointHash",pointHash);
-                //Log.d("abcdehash", String.valueOf(pointHash.size()));
-                localities = new String[0];
-                specialities = new String[0];
-                specialityHash = new HashMap<>();
-                pointHash = new HashMap<>();
+
+                Log.d("hashsizepoint", " size "+ pointHash.size());
+                //localities = new String[0];
+                //specialities = new String[0];
+                //specialityHash = new HashMap<>();
+                //pointHash = new HashMap<>();
                 startActivity(profileListIntent);
             }
         });
@@ -866,6 +874,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void GetLocalityArray(JSONArray info) {
         localities = new String[info.length() + 2];
+        pointHash = new HashMap<>();
         if (info.length() == 0) {
             localities[0] = "Coming Soon!";
         } else {
@@ -886,6 +895,8 @@ public class MainActivity extends AppCompatActivity {
                 e.printStackTrace();
             }
             localities[i + 2] = localityName;
+            point = new LatLng(Double.parseDouble(localityList.optString("llocality_lat")), Double.parseDouble(localityList.optString("llocality_long")));
+            pointHash.put(localityName,point);
         }
         locationSpinner = Helper.SetSpinner(MainActivity.this, localities, locationSpinner);
     }

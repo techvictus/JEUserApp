@@ -463,10 +463,10 @@ public class ListActivity extends AppCompatActivity {
                 profileListIntent.putExtra("specialities", specialities);
                 profileListIntent.putExtra("specialityHash", specialityHash);
                 profileListIntent.putExtra("pointHash", pointHash);
-                localities = new String[0];
-                specialities = new String[0];
-                specialityHash = new HashMap<>();
-                pointHash = new HashMap<>();
+//                localities = new String[0];
+//                specialities = new String[0];
+//                specialityHash = new HashMap<>();
+//                pointHash = new HashMap<>();
                 startActivity(profileListIntent);
             }
         });
