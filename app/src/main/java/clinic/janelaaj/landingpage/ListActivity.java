@@ -8,13 +8,14 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.location.Address;
 import android.location.Geocoder;
-import android.location.LocationManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
 
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.text.Html;
 import android.util.Base64;
 import android.util.Log;
@@ -48,12 +49,8 @@ import org.json.JSONObject;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.sql.Blob;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 
@@ -94,14 +91,14 @@ public class ListActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_list);
 
-        ImageView inbox = (ImageView) findViewById(R.id.inbox);
-        inbox.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent landingPageIntent = new Intent(ListActivity.this, MainActivity.class);
-                startActivity(landingPageIntent);
-            }
-        });
+//        ImageView inbox = (ImageView) findViewById(R.id.inbox);
+//        inbox.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                Intent landingPageIntent = new Intent(ListActivity.this, MainActivity.class);
+//                startActivity(landingPageIntent);
+//            }
+//        });
 
         Intent intent = getIntent();
         cityName = intent.getExtras().getString("CityName");
@@ -716,17 +713,6 @@ public class ListActivity extends AppCompatActivity {
                 String discountflag = obj.optString("ldiscountflag");
                 profiles.add(new Profile(doctorId, doctorName, doctorGender, doctorExperience, doctorSpeciality, doctorphoto, mbbsflag, mdflag, msflag, cliniclocationname, addressline1, addressline2, city, pincode, rating, normalamount, discountedamount, discountflag));
             }
-            ProfileAdapter adapter = new ProfileAdapter(ListActivity.this, profiles);
-            profileListView = (ListView) findViewById(R.id.list);
-            btnLoadMore = new Button(ListActivity.this);
-            btnLoadMore.setText("Load More");
-            profileListView.addFooterView(btnLoadMore);
-            profileListView.setAdapter(adapter);
-
-            if (progressDialog != null) {
-                progressDialog.dismiss();
-                progressDialog = null;
-            }
         }
     }
 
@@ -769,9 +755,13 @@ public class ListActivity extends AppCompatActivity {
                                 Log.d("abcde", doctorId + doctorName + doctorGender + doctorExperience + doctorSpeciality + doctorphoto + mbbsflag + mdflag + msflag + cliniclocationname + addressline1 + addressline2 + city + pincode + rating + normalamount + discountedamount + discountflag);
                                 profiles.add(new Profile(doctorId, doctorName, doctorGender, doctorExperience, doctorSpeciality, doctorphoto, mbbsflag, mdflag, msflag, cliniclocationname, addressline1, addressline2, city, pincode, rating, normalamount, discountedamount, discountflag));
                             }
-                            ProfileAdapter adapter = new ProfileAdapter(ListActivity.this, profiles);
-                            ListView profileListView = (ListView) findViewById(R.id.list);
-                            profileListView.setAdapter(adapter);
+                            RecyclerView recyclerView = (RecyclerView) findViewById(R.id.list);
+                            // set a LinearLayoutManager with default horizontal orientation and false value for reverseLayout to show the items from start to end
+                            LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getApplicationContext(),LinearLayoutManager.VERTICAL,false);
+                            recyclerView.setLayoutManager(linearLayoutManager);
+                            // call the constructor of CustomAdapter to send the reference and data to Adapter
+                            ProfileAdapter customAdapter = new ProfileAdapter(ListActivity.this, profiles);
+                            recyclerView.setAdapter(customAdapter); // set the Adapter to RecyclerView
 
                         } catch (JSONException e) {
                             e.printStackTrace();
@@ -804,7 +794,6 @@ public class ListActivity extends AppCompatActivity {
         };
         Volley.newRequestQueue(this).add(postRequest);
     }
-
     public String resizeBase64Image(String base64image) {
         byte[] encodeByte = Base64.decode(base64image.getBytes(), Base64.DEFAULT);
         BitmapFactory.Options options = new BitmapFactory.Options();
