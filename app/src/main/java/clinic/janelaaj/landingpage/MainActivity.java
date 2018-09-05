@@ -813,7 +813,7 @@ public class MainActivity extends AppCompatActivity {
                 lists = info;
             } catch (JSONException e) {
                 //e.printStackTrace();
-                Alerts.ServerDown(MainActivity.this);
+                //Alerts.ServerDown(MainActivity.this);
                 return;
             }
             if (locality)
